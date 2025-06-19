@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         INVENTORY = 'ansible/inventory.ini'
-        PLAYBOOK = 'ansible/deploy.yml'
+        PLAYBOOK = 'ansible/nginx_deploy.yml'
     }
 
     stages {
@@ -20,11 +20,18 @@ pipeline {
         stage('Deploy via Ansible') {
             steps {
                 sshagent (credentials: ['ec2-ssh-key']) {
-                    sh '''
-                        ansible-playbook -i $INVENTORY $PLAYBOOK
-                    '''
+                    sh 'ansible-playbook -i $INVENTORY $PLAYBOOK'
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployed successfully!'
+        }
+        failure {
+            echo '❌ Deployment failed!'
         }
     }
 }
