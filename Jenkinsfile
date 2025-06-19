@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'willhallonline/ansible:latest'
+            image 'willhallonline/ansible:debian'
             args '-u root'  // ensures SSH access and permissions
         }
     }
