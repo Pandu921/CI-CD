@@ -27,6 +27,10 @@ pipeline {
                     sh '''
                         cd ${WORKSPACE}
                         echo "📂 Running from $(pwd)"
+                        
+                        # Disable host key checking for Ansible
+                        export ANSIBLE_HOST_KEY_CHECKING=False
+                        
                         ansible-playbook -i Ansiblefiles/inventory.ini Ansiblefiles/nginx_deploy.yml
                     '''
                 }
