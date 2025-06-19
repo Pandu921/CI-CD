@@ -2,6 +2,7 @@ pipeline {
     agent {
         docker {
             image 'willhallonline/ansible:latest'
+            // Removed the invalid -u 105:109 and kept only the SSH volume mount
             args '-v /root/.ssh:/root/.ssh:ro'
         }
     }
@@ -25,6 +26,7 @@ pipeline {
 
         stage('Deploy via Ansible') {
             steps {
+                // Use Jenkins SSH agent to inject private key for SSH
                 sshagent(['ssh-key']) {
                     sh '''
                         cd $WORKSPACE/Ansiblefiles
