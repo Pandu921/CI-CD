@@ -22,7 +22,7 @@ pipeline {
 
         stage('Deploy via Ansible') {
             steps {
-                sshagent(['your-ssh-private-key-id']) {
+                sshagent(['ssh-key']) {
                     dir("${REPO_DIR}/ansible") {
                         sh 'ansible-playbook -i inventory.ini nginx_deploy.yml'
                     }
