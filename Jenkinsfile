@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        SSH_KEY = credentials('ubuntu')
+        SSH_KEY = credentials('ssh-key')
     }
 
     stages {
@@ -23,7 +23,7 @@ pipeline {
 
         stage('Deploy via Ansible') {
             steps {
-                sshagent (credentials: ['ubuntu']) {
+                sshagent (credentials: ['ssh-key']) {
                     sh '''
                         cd ${WORKSPACE}
                         echo "📂 Running from $(pwd)"
