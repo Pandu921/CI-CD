@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'willhallonline/ansible:debian'
-            args '-u root'  // ensures SSH access and permissions
+            image 'willhallonline/ansible:latest'
+            args '-u root' // run as root to install packages
         }
     }
 
@@ -12,18 +12,28 @@ pipeline {
     }
 
     stages {
+        stage('Install Git') {
+            steps {
+                sh '''
+                    echo "🔧 Installing Git..."
+                    apt update && apt install -y git
+                    git --version
+                '''
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git 'https://github.com/Pandu921/CI-CD.git'
             }
         }
 
-        stage('Verify Setup') {
+        stage('Verify Files') {
             steps {
                 sh '''
-                    echo "🔍 Verifying Ansible..."
-                    ansible --version || echo "❌ Ansible not found!"
-                    echo "🔍 Verifying inventory file:"
+                    echo "📁 Contents of ansible directory:"
+                    ls -la ansible/
+                    echo "📄 Inventory file:"
                     cat $INVENTORY
                 '''
             }
@@ -33,7 +43,7 @@ pipeline {
             steps {
                 sshagent (credentials: ['ec2-ssh-key']) {
                     sh '''
-                        echo "🚀 Running Ansible Playbook"
+                        echo "🚀 Running Ansible Playbook..."
                         ansible-playbook -i $INVENTORY $PLAYBOOK
                     '''
                 }
@@ -46,7 +56,7 @@ pipeline {
             echo '✅ Deployment completed successfully!'
         }
         failure {
-            echo '❌ Deployment failed. Check logs.'
+            echo '❌ Deployment failed. Check logs above.'
         }
     }
 }
