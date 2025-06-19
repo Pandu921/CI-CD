@@ -9,6 +9,8 @@ pipeline {
     environment {
         REPO_DIR = 'ci-cd-repo'
         SSH_KEY = credentials('ssh-key') // Set this in Jenkins > Credentials
+        HOME = '/tmp' // Fix for Ansible permission issue
+        ANSIBLE_HOST_KEY_CHECKING = 'False'
     }
 
     stages {
