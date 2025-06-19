@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'willhallonline/ansible:latest' // Pre-installed Ansible
+            image 'willhallonline/ansible:latest'
         }
     }
 
@@ -13,23 +13,18 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/your-static-site.git'
+                git 'https://github.com/Pandu921/CI-CD.git'
             }
         }
 
         stage('Deploy via Ansible') {
             steps {
-                sh 'ansible-playbook -i $INVENTORY $PLAYBOOK'
+                sshagent (credentials: ['ec2-ssh-key']) {
+                    sh '''
+                        ansible-playbook -i $INVENTORY $PLAYBOOK
+                    '''
+                }
             }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Deployed to EC2 via Ansible!'
-        }
-        failure {
-            echo '❌ Deployment failed.'
         }
     }
 }

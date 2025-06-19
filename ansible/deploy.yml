@@ -1,6 +1,6 @@
 ---
 - name: Deploy static site to EC2
-  hosts: web
+  hosts: all
   become: true
 
   tasks:
