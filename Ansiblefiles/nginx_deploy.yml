@@ -12,7 +12,7 @@
 
     - name: Copy app files to web root
       copy:
-        src: App/
+        src: ../App/
         dest: /var/www/html/
         mode: '0644'
 
