@@ -8,16 +8,16 @@ pipeline {
 
     environment {
         SSH_KEY = credentials('ssh-key') // Jenkins > Credentials
-        HOME = '/tmp' // Fix Ansible tmp permission
+        HOME = '/tmp'                    // To avoid Ansible permission issue
         ANSIBLE_HOST_KEY_CHECKING = 'False'
     }
 
     stages {
-        stage('Print Workspace & Verify') {
+        stage('Print Structure') {
             steps {
                 sh '''
                     echo "Jenkins WORKSPACE: $WORKSPACE"
-                    echo "Directory Tree:"
+                    echo "List structure under workspace:"
                     find $WORKSPACE
                 '''
             }
@@ -28,7 +28,7 @@ pipeline {
                 sshagent(['ssh-key']) {
                     sh '''
                         cd $WORKSPACE/ci-cd-repo/Ansiblefiles
-                        echo "Current Dir: $(pwd)"
+                        echo "📂 Running from $(pwd)"
                         ls -l
                         ansible-playbook -i inventory.ini nginx_deploy.yml
                     '''
@@ -39,7 +39,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployed successfully!'
+            echo '✅ Deployment successful!'
         }
         failure {
             echo '❌ Deployment failed!'
