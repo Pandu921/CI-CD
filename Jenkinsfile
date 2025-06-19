@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'willhallonline/ansible:latest'
-        }
-    }
+    agent any
 
     environment {
         INVENTORY = 'ansible/inventory.ini'
@@ -23,15 +19,6 @@ pipeline {
                     sh 'ansible-playbook -i $INVENTORY $PLAYBOOK'
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Deployed successfully!'
-        }
-        failure {
-            echo '❌ Deployment failed!'
         }
     }
 }
