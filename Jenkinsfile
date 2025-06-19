@@ -2,13 +2,13 @@ pipeline {
     agent {
         docker {
             image 'willhallonline/ansible:latest'
-            // Removed the invalid -u 105:109 and kept only the SSH volume mount
-            args '-v /root/.ssh:/root/.ssh:ro'
+            // Explicitly override user to root so SSH can run without UID issues
+            args '--user=root -v /root/.ssh:/root/.ssh:ro'
         }
     }
 
     environment {
-        SSH_KEY = credentials('ssh-key')
+        SSH_KEY = credentials('ssh-key')   // your SSH credential ID in Jenkins
         HOME = '/tmp'
         ANSIBLE_HOST_KEY_CHECKING = 'False'
     }
@@ -26,7 +26,6 @@ pipeline {
 
         stage('Deploy via Ansible') {
             steps {
-                // Use Jenkins SSH agent to inject private key for SSH
                 sshagent(['ssh-key']) {
                     sh '''
                         cd $WORKSPACE/Ansiblefiles
