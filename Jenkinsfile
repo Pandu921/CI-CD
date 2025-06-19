@@ -27,7 +27,7 @@ pipeline {
             steps {
                 sshagent(['ssh-key']) {
                     sh '''
-                        cd $WORKSPACE/ci-cd-repo/ansible
+                        cd $WORKSPACE/ci-cd-repo/Ansiblefiles
                         echo "Current Dir: $(pwd)"
                         ls -l
                         ansible-playbook -i inventory.ini nginx_deploy.yml
