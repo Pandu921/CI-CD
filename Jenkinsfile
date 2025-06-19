@@ -2,36 +2,32 @@ pipeline {
     agent {
         docker {
             image 'willhallonline/ansible:latest'
-            // Explicitly override user to root so SSH can run without UID issues
-            args '--user=root -v /root/.ssh:/root/.ssh:ro'
+            args '-u root -v /root/.ssh:/root/.ssh:ro'
         }
     }
 
     environment {
-        SSH_KEY = credentials('ssh-key')   // your SSH credential ID in Jenkins
-        HOME = '/tmp'
-        ANSIBLE_HOST_KEY_CHECKING = 'False'
+        SSH_KEY = credentials('ubuntu')
     }
 
     stages {
         stage('Print Structure') {
             steps {
                 sh '''
-                    echo "Jenkins WORKSPACE: $WORKSPACE"
+                    echo "Jenkins WORKSPACE: ${WORKSPACE}"
                     echo "List structure under workspace:"
-                    find $WORKSPACE
+                    find ${WORKSPACE}
                 '''
             }
         }
 
         stage('Deploy via Ansible') {
             steps {
-                sshagent(['ssh-key']) {
+                sshagent (credentials: ['ubuntu']) {
                     sh '''
-                        cd $WORKSPACE/Ansiblefiles
+                        cd ${WORKSPACE}
                         echo "📂 Running from $(pwd)"
-                        ls -l
-                        ansible-playbook -i inventory.ini nginx_deploy.yml
+                        ansible-playbook -i Ansiblefiles/inventory.ini Ansiblefiles/nginx_deploy.yml
                     '''
                 }
             }
@@ -39,11 +35,11 @@ pipeline {
     }
 
     post {
-        success {
-            echo '✅ Deployment successful!'
-        }
         failure {
             echo '❌ Deployment failed!'
+        }
+        success {
+            echo '✅ Deployment succeeded!'
         }
     }
 }
