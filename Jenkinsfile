@@ -7,8 +7,8 @@ pipeline {
     }
 
     environment {
-        SSH_KEY = credentials('ssh-key') // Jenkins > Credentials
-        HOME = '/tmp'                    // To avoid Ansible permission issue
+        SSH_KEY = credentials('ssh-key')
+        HOME = '/tmp'
         ANSIBLE_HOST_KEY_CHECKING = 'False'
     }
 
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 sshagent(['ssh-key']) {
                     sh '''
-                        cd $WORKSPACE/ci-cd-repo/Ansiblefiles
+                        cd $WORKSPACE/Ansiblefiles
                         echo "📂 Running from $(pwd)"
                         ls -l
                         ansible-playbook -i inventory.ini nginx_deploy.yml
