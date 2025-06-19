@@ -9,7 +9,7 @@ pipeline {
     environment {
         REPO_DIR = 'ci-cd-repo'
         SSH_KEY = credentials('ssh-key') // Set this in Jenkins > Credentials
-        HOME = '/tmp' // Fix for Ansible permission issue
+        HOME = '/tmp' // Fix Ansible tmp permission issue
         ANSIBLE_HOST_KEY_CHECKING = 'False'
     }
 
@@ -17,7 +17,11 @@ pipeline {
         stage('Verify Structure') {
             steps {
                 dir("${REPO_DIR}/ansible") {
-                    sh 'ls -l'
+                    sh '''
+                        echo "PWD in Jenkins inside container: $(pwd)"
+                        echo "Listing all files:"
+                        ls -la
+                    '''
                 }
             }
         }
@@ -26,7 +30,10 @@ pipeline {
             steps {
                 sshagent(['ssh-key']) {
                     dir("${REPO_DIR}/ansible") {
-                        sh 'ansible-playbook -i inventory.ini nginx_deploy.yml'
+                        sh '''
+                            echo "Running Ansible from: $(pwd)"
+                            ansible-playbook -i inventory.ini nginx_deploy.yml
+                        '''
                     }
                 }
             }
