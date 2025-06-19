@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'willhallonline/ansible:latest'
-            args '-u root' // run as root to install packages
+            args '-u root'
         }
     }
 
@@ -15,35 +15,26 @@ pipeline {
         stage('Install Git') {
             steps {
                 sh '''
-                    echo "🔧 Installing Git..."
                     apt update && apt install -y git
                     git --version
                 '''
             }
         }
 
-        stage('Checkout Code') {
-            steps {
-                git 'https://github.com/Pandu921/CI-CD.git'
-            }
-        }
-
         stage('Verify Files') {
             steps {
                 sh '''
-                    echo "📁 Contents of ansible directory:"
+                    echo "📁 Checking ansible directory:"
                     ls -la ansible/
-                    echo "📄 Inventory file:"
                     cat $INVENTORY
                 '''
             }
         }
 
-        stage('Deploy to EC2 with Ansible') {
+        stage('Deploy to EC2') {
             steps {
                 sshagent (credentials: ['ec2-ssh-key']) {
                     sh '''
-                        echo "🚀 Running Ansible Playbook..."
                         ansible-playbook -i $INVENTORY $PLAYBOOK
                     '''
                 }
@@ -53,10 +44,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment completed successfully!'
+            echo '✅ Deployment done!'
         }
         failure {
-            echo '❌ Deployment failed. Check logs above.'
+            echo '❌ Failed. Check logs.'
         }
     }
 }
